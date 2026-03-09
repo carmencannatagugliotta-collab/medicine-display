@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le Mie Medicine</title>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f4f8;
+    --surface: #ffffff;
+    --navy: #1a2e4a;
+    --teal: #2a7d6f;
+    --amber: #e8a020;
+    --red: #c0392b;
+    --green: #27ae60;
+    --blue: #2980b9;
+    --text: #1a2e4a;
+    --muted: #7a8fa6;
+    --radius: 22px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Lexend', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* ── TOPBAR ── */
+  #topbar {
+    background: var(--navy);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 40px;
+    flex-shrink: 0;
+  }
+  #giorno-nome {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 50px; letter-spacing: 3px; line-height: 1;
+  }
+  #data-completa { font-size: 16px; color: rgba(255,255,255,0.5); font-weight: 300; margin-top: 3px; }
+  #orologio {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 70px; letter-spacing: 4px; line-height: 1;
+  }
+  #fase-tag {
+    background: var(--amber); color: var(--navy);
+    font-size: 20px; font-weight: 800;
+    padding: 10px 26px; border-radius: 50px;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+
+  /* ── MAIN ── */
+  #main {
+    flex: 1;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    gap: 16px;
+    padding: 18px 40px 14px;
+    overflow: hidden;
+  }
+
+  /* ── PROGRESS ── */
+  #progress-wrap { height: 6px; background: rgba(26,46,74,0.1); border-radius: 10px; overflow: hidden; }
+  #progress-bar { height: 100%; background: linear-gradient(90deg, var(--teal), var(--amber)); border-radius: 10px; transition: width 30s linear; }
+
+  /* ── PROSSIMO EVENTO ── */
+  #prossimo-card {
+    border-radius: var(--radius); padding: 18px 28px;
+    display: flex; align-items: center; gap: 22px; color: white; flex-shrink: 0;
+  }
+  #prossimo-card.tipo-med   { background: var(--teal); }
+  #prossimo-card.tipo-pasto { background: var(--blue); }
+  #prossimo-icon { font-size: 44px; line-height: 1; }
+  #prossimo-label { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.6); margin-bottom: 3px; }
+  #prossimo-desc  { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; line-height: 1; }
+  #prossimo-ora   { font-size: 17px; color: rgba(255,255,255,0.75); font-weight: 300; }
+  #countdown { font-family: 'Bebas Neue', sans-serif; font-size: 46px; letter-spacing: 2px; margin-left: auto; }
+  #countdown-label { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; text-align: right; }
+
+  /* ── TIMELINE ── */
+  #timeline { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; align-items: stretch; flex-shrink: 0; }
+  #timeline::-webkit-scrollbar { display: none; }
+  .tl-item {
+    flex: 0 0 auto; background: var(--surface); border-radius: 14px;
+    padding: 12px 14px; min-width: 100px; text-align: center;
+    border: 2px solid transparent; transition: all 0.3s; position: relative;
+  }
+  .tl-item.passato { opacity: 0.38; }
+  .tl-item.corrente { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(232,160,32,0.2); }
+  .tl-item.med-item .tl-tipo   { color: var(--teal); }
+  .tl-item.pasto-item .tl-tipo { color: var(--blue); }
+  .tl-ora  { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1px; line-height: 1; }
+  .tl-icon { font-size: 20px; margin: 3px 0; }
+  .tl-tipo { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tl-check { position: absolute; top: 5px; right: 7px; font-size: 13px; }
+
+  /* ── CASSETTINI ── */
+  #cassettini-section { overflow-y: auto; }
+  #cassettini-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 12px; }
+  #cassettini-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .cass-card {
+    background: var(--surface); border-radius: 16px; padding: 16px 12px;
+    text-align: center; border: 2px solid transparent;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06); transition: all 0.3s;
+  }
+  .cass-card.attivo {
+    border-color: var(--amber);
+    box-shadow: 0 0 0 4px rgba(232,160,32,0.18), 0 4px 20px rgba(0,0,0,0.1);
+    animation: pulse-card 2s ease-in-out infinite;
+  }
+  .cass-card.preso { opacity: 0.38; border-color: var(--green); }
+  @keyframes pulse-card {
+    0%,100% { box-shadow: 0 0 0 4px rgba(232,160,32,0.18); }
+    50%      { box-shadow: 0 0 0 9px rgba(232,160,32,0.3); }
+  }
+  .cass-pill-nome { font-size: 18px; font-weight: 900; color: var(--text); margin-bottom: 7px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .cass-pill-icon { font-size: 24px; margin-bottom: 7px; }
+  .cass-numero {
+    font-family: 'Bebas Neue', sans-serif; font-size: 50px; line-height: 1;
+    width: 68px; height: 68px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 5px; background: var(--navy); color: white;
+    box-shadow: 0 4px 12px rgba(26,46,74,0.22); transition: all 0.3s;
+  }
+  .cass-card.attivo .cass-numero {
+    background: var(--amber); color: var(--navy);
+    box-shadow: 0 4px 20px rgba(232,160,32,0.45); transform: scale(1.07);
+  }
+  .cass-label { font-size: 14px; color: var(--navy); font-weight: 800; letter-spacing: 0.5px; margin-top: 4px; }
+  .cass-ora   { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* ── LOG BAR ── */
+  #log-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; flex-shrink: 0; }
+  .log-chip { background: var(--surface); border-radius: 8px; padding: 5px 12px; font-size: 12px; font-weight: 600; border-left: 4px solid var(--green); }
+
+  /* ── OVERLAY MEDICINA ── */
+  #overlay-med {
+    display: none; position: fixed; inset: 0;
+    background: rgba(192,57,43,0.96); z-index: 900;
+    flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; gap: 24px;
+    animation: alarm-pulse 1s ease-in-out infinite alternate;
+  }
+  #overlay-med.show { display: flex; }
+  @keyframes alarm-pulse {
+    from { background: rgba(192,57,43,0.96); }
+    to   { background: rgba(231,76,60,0.99); }
+  }
+  .ov-icon { font-size: 80px; animation: shake 0.5s ease-in-out infinite alternate; }
+  @keyframes shake {
+    from { transform: rotate(-8deg) scale(1); }
+    to   { transform: rotate(8deg)  scale(1.1); }
+  }
+  .ov-titolo { font-family: 'Bebas Neue', sans-serif; font-size: 70px; letter-spacing: 4px; color: white; line-height: 1; }
+  .ov-desc   { font-size: 28px; color: rgba(255,255,255,0.85); font-weight: 300; }
+  .ov-cassettini { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+  .ov-cass-box   { text-align: center; }
+  .ov-cass-nome  { display: none; }
+  .ov-cass-num {
+    background: white; color: var(--red);
+    border-radius: 22px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 16px 32px;
+    animation: pop 0.6s ease-in-out infinite alternate;
+    min-width: 160px;
+  }
+  .ov-cass-num .cass-mini-label {
+    font-family: 'Lexend', sans-serif; font-size: 16px; font-weight: 700;
+    color: var(--red); letter-spacing: 1px; margin-bottom: 0px;
+  }
+  .ov-cass-num .cass-big-num {
+    font-family: 'Bebas Neue', sans-serif; font-size: 100px; line-height: 1; color: var(--red);
+  }
+  @keyframes pop { from { transform: scale(1); } to { transform: scale(1.06); } }
+  #btn-preso {
+    background: white; color: var(--red); border: none;
+    font-family: 'Lexend', sans-serif; font-size: 26px; font-weight: 800;
+    padding: 20px 54px; border-radius: 50px; cursor: pointer;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+  }
+  #btn-preso:active { transform: scale(0.96); }
+
+  /* ── OVERLAY PASTO ── */
+  #overlay-pasto {
+    display: none; position: fixed; inset: 0;
+    background: rgba(41,128,185,0.95); z-index: 900;
+    flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; gap: 24px;
+  }
+  #overlay-pasto.show { display: flex; }
+  .ov-pasto-icon   { font-size: 96px; }
+  .ov-pasto-titolo { font-family: 'Bebas Neue', sans-serif; font-size: 78px; letter-spacing: 4px; color: white; line-height: 1; }
+  .ov-pasto-desc   { font-size: 26px; color: rgba(255,255,255,0.8); font-weight: 300; }
+  #btn-ok-pasto {
+    background: white; color: var(--blue); border: none;
+    font-family: 'Lexend', sans-serif; font-size: 22px; font-weight: 800;
+    padding: 17px 48px; border-radius: 50px; cursor: pointer;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+  }
+
+  /* ── ADMIN ── */
+  #admin-toggle {
+    position: fixed; bottom: 14px; right: 18px;
+    background: var(--navy); color: white; border: none;
+    border-radius: 50px; padding: 9px 16px; font-size: 11px;
+    font-family: 'Lexend', sans-serif; cursor: pointer;
+    opacity: 0.2; transition: opacity 0.3s; z-index: 500;
+  }
+  #admin-toggle:hover { opacity: 1; }
+  #admin-panel {
+    display: none; position: fixed; inset: 0;
+    background: rgba(26,46,74,0.97); z-index: 800;
+    padding: 34px 40px; overflow-y: auto; color: white;
+  }
+  #admin-panel.show { display: block; }
+  #admin-panel h2 { font-family: 'Bebas Neue', sans-serif; font-size: 38px; letter-spacing: 3px; color: var(--amber); margin-bottom: 26px; }
+  .admin-sec { margin-bottom: 26px; }
+  .admin-sec h3 { font-size: 12px; text-transform: uppercase; letter-spacing: 2px; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
+  .orari-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .orario-item { background: rgba(255,255,255,0.08); border-radius: 12px; padding: 13px; text-align: center; }
+  .orario-item label { font-size: 11px; color: rgba(255,255,255,0.45); display: block; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; }
+  .orario-item input[type="time"] {
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px; color: white; font-size: 22px;
+    font-family: 'Lexend', sans-serif; font-weight: 700;
+    width: 100%; text-align: center; padding: 6px;
+  }
+  .btn-a {
+    background: var(--amber); color: var(--navy); border: none;
+    border-radius: 11px; padding: 12px 26px; font-size: 14px;
+    font-family: 'Lexend', sans-serif; font-weight: 700;
+    cursor: pointer; margin-right: 8px; margin-top: 8px;
+  }
+  .btn-a.ghost  { background: rgba(255,255,255,0.12); color: white; }
+  .btn-a.danger { background: rgba(192,57,43,0.7); color: white; }
+  #log-full {
+    background: rgba(0,0,0,0.35); border-radius: 12px; padding: 16px;
+    font-size: 13px; line-height: 2; max-height: 160px; overflow-y: auto;
+    font-family: monospace; color: #a8d8a8;
+  }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div>
+    <div id="giorno-nome">—</div>
+    <div id="data-completa">—</div>
+  </div>
+  <div id="fase-tag">—</div>
+  <div style="text-align:right">
+    <div id="orologio">00:00</div>
+  </div>
+</div>
+
+<div id="main">
+  <div id="progress-wrap"><div id="progress-bar" style="width:0%"></div></div>
+
+  <div id="prossimo-card" class="tipo-med">
+    <div id="prossimo-icon">💊</div>
+    <div>
+      <div id="prossimo-label">Prossimo</div>
+      <div id="prossimo-desc">—</div>
+      <div id="prossimo-ora">—</div>
+    </div>
+    <div style="margin-left:auto;text-align:right">
+      <div id="countdown-label">tra</div>
+      <div id="countdown">—</div>
+    </div>
+  </div>
+
+  <div id="timeline"></div>
+
+  <div id="cassettini-section">
+    <div id="cassettini-title">💊 Pastiglie di oggi — cassettini da aprire</div>
+    <div id="cassettini-grid"></div>
+  </div>
+
+  <div id="log-bar">
+    <span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-right:4px">✅ Oggi assunto:</span>
+    <span style="color:var(--muted);font-size:13px">Nessuno ancora</span>
+  </div>
+</div>
+
+<!-- OVERLAY MEDICINA -->
+<div id="overlay-med">
+  <div class="ov-icon">🔔</div>
+  <div class="ov-titolo" id="ov-med-titolo">ORA LA MEDICINA!</div>
+  <div class="ov-desc"   id="ov-med-desc">—</div>
+  <div class="ov-cassettini" id="ov-med-cassettini"></div>
+  <button id="btn-preso" onclick="confermaMed()">✅ HO PRESO LA MEDICINA</button>
+</div>
+
+<!-- OVERLAY PASTO -->
+<div id="overlay-pasto">
+  <div class="ov-pasto-icon"   id="ov-pasto-icon">🥐</div>
+  <div class="ov-pasto-titolo" id="ov-pasto-titolo">COLAZIONE!</div>
+  <div class="ov-pasto-desc"   id="ov-pasto-desc">È il momento di fare colazione</div>
+  <button id="btn-ok-pasto" onclick="chiudiPasto()">👍 OK, grazie!</button>
+</div>
+
+<!-- ADMIN -->
+<button id="admin-toggle" onclick="toggleAdmin()">⚙️ Pannello Remoto</button>
+
+<div id="admin-panel">
+  <h2>⚙️ Pannello di Controllo Remoto</h2>
+  <div class="admin-sec">
+    <h3>Orari (modificabili da remoto in qualsiasi momento)</h3>
+    <div class="orari-grid">
+      <div class="orario-item">
+        <label>💊 Pastiglia 1<br><small style="opacity:.5">prima colazione</small></label>
+        <input type="time" id="ora-p1" value="07:45">
+      </div>
+      <div class="orario-item">
+        <label>🥐 Colazione</label>
+        <input type="time" id="ora-colaz" value="08:00">
+      </div>
+      <div class="orario-item">
+        <label>💊 Pastiglia 3<br><small style="opacity:.5">dopo colazione</small></label>
+        <input type="time" id="ora-p3" value="08:10">
+      </div>
+      <div class="orario-item">
+        <label>🍽️ Pranzo</label>
+        <input type="time" id="ora-pranzo" value="12:30">
+      </div>
+      <div class="orario-item">
+        <label>💊 Pastiglia 6<br><small style="opacity:.5">dopo pranzo</small></label>
+        <input type="time" id="ora-p6" value="13:00">
+      </div>
+      <div class="orario-item">
+        <label>🍷 Cena</label>
+        <input type="time" id="ora-cena" value="19:00">
+      </div>
+      <div class="orario-item">
+        <label>💊 Pastiglia 7<br><small style="opacity:.5">dopo cena</small></label>
+        <input type="time" id="ora-p7" value="19:30">
+      </div>
+      <div class="orario-item">
+        <label>💊 Pastiglia 10<br><small style="opacity:.5">sera</small></label>
+        <input type="time" id="ora-p10" value="21:00">
+      </div>
+    </div>
+    <button class="btn-a" onclick="salvaOrari()">💾 Salva Orari</button>
+    <button class="btn-a ghost" onclick="testMed()">🔔 Test Allarme Med.</button>
+    <button class="btn-a ghost" onclick="testPasto()">🍽️ Test Avviso Pasto</button>
+  </div>
+  <div class="admin-sec">
+    <h3>Storico assunzioni</h3>
+    <div id="log-full">Nessun dato ancora</div>
+    <button class="btn-a" onclick="copiaLog()">📋 Copia Log</button>
+    <button class="btn-a danger" onclick="svuotaLog()">🗑️ Svuota Log</button>
+  </div>
+  <button class="btn-a ghost" onclick="toggleAdmin()">✖ Chiudi Pannello</button>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  CASSETTINI PER GIORNO (0=Dom, 1=Lun, ... 6=Sab)
+//  Ogni giorno: p1e3 (past.1 e 3 stesso cassettino),
+//               p6, p7, p10
+// ═══════════════════════════════════════════════
+const CASSETTINI = {
+  1: { p1e3:1,  p6:2,  p7:3,  p10:4  },
+  2: { p1e3:5,  p6:6,  p7:7,  p10:8  },
+  3: { p1e3:9,  p6:10, p7:11, p10:12 },
+  4: { p1e3:13, p6:14, p7:15, p10:16 },
+  5: { p1e3:17, p6:18, p7:19, p10:20 },
+  6: { p1e3:21, p6:22, p7:23, p10:24 },
+  0: { p1e3:25, p6:26, p7:27, p10:28 }
+};
+
+// ═══════════════════════════════════════════════
+//  DEFINIZIONE EVENTI GIORNATA
+// ═══════════════════════════════════════════════
+const EVENTI_DEFAULT = [
+  { key:'p1',    tipo:'med',   desc:'Pastiglia 1',  icon:'💊', ora:'07:45', cassKey:'p1e3', pillola:'1'  },
+  { key:'colaz', tipo:'pasto', desc:'Colazione',    icon:'🥐', ora:'08:00' },
+  { key:'p3',    tipo:'med',   desc:'Pastiglia 3',  icon:'💊', ora:'08:10', cassKey:'p1e3', pillola:'3'  },
+  { key:'pranzo',tipo:'pasto', desc:'Pranzo',       icon:'🍽️', ora:'12:30' },
+  { key:'p6',    tipo:'med',   desc:'Pastiglia 6',  icon:'💊', ora:'13:00', cassKey:'p6',   pillola:'6'  },
+  { key:'cena',  tipo:'pasto', desc:'Cena',         icon:'🍷', ora:'19:00' },
+  { key:'p7',    tipo:'med',   desc:'Pastiglia 7',  icon:'💊', ora:'19:30', cassKey:'p7',   pillola:'7'  },
+  { key:'p10',   tipo:'med',   desc:'Pastiglia 10', icon:'💊', ora:'21:00', cassKey:'p10',  pillola:'10' }
+];
+
+const PASTO_CFG = {
+  colaz:  { titolo:'COLAZIONE!', desc:'È il momento di fare colazione 🥐', icon:'🥐' },
+  pranzo: { titolo:'PRANZO!',    desc:"È ora di andare a pranzo 🍽️",       icon:'🍽️' },
+  cena:   { titolo:'CENA!',      desc:'È ora di cenare 🍷',                icon:'🍷' }
+};
+
+// ═══════════════════════════════════════════════
+//  STATO
+// ═══════════════════════════════════════════════
+const pad = n => String(n).padStart(2,'0');
+const GIORNI = ['Domenica','Lunedì','Martedì','Mercoledì','Giovedì','Venerdì','Sabato'];
+const MESI   = ['gennaio','febbraio','marzo','aprile','maggio','giugno','luglio','agosto','settembre','ottobre','novembre','dicembre'];
+
+function oraMins(s) { const [h,m] = s.split(':').map(Number); return h*60+m; }
+function nowMins()  { const n = new Date(); return n.getHours()*60+n.getMinutes(); }
+
+function caricaEventi() {
+  const saved = JSON.parse(localStorage.getItem('orari_v2') || 'null');
+  return EVENTI_DEFAULT.map(e => ({...e, ora: saved?.[e.key] || e.ora }))
+    .sort((a,b) => oraMins(a.ora) - oraMins(b.ora));
+}
+
+let eventi = caricaEventi();
+let log    = JSON.parse(localStorage.getItem('med_log') || '[]');
+
+const oggiStr = new Date().toDateString();
+if (localStorage.getItem('giorno_reset') !== oggiStr) {
+  localStorage.setItem('giorno_reset', oggiStr);
+  localStorage.setItem('scattati', '{}');
+  localStorage.setItem('prese',    '{}');
+}
+let scattati = JSON.parse(localStorage.getItem('scattati') || '{}');
+let prese    = JSON.parse(localStorage.getItem('prese')    || '{}');
+
+let eventoCorrente = null;
+let alarmLoop = null;
+let audioCtx  = null;
+
+// ═══════════════════════════════════════════════
+//  RENDER PRINCIPALE
+// ═══════════════════════════════════════════════
+function render() {
+  const now  = new Date();
+  const dow  = now.getDay();
+  const mins = nowMins();
+
+  // Topbar
+  document.getElementById('giorno-nome').textContent    = GIORNI[dow];
+  document.getElementById('data-completa').textContent  = `${now.getDate()} ${MESI[now.getMonth()]} ${now.getFullYear()}`;
+  document.getElementById('orologio').textContent       = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  document.getElementById('fase-tag').textContent       = faseDel(mins);
+
+  // Progress bar
+  document.getElementById('progress-bar').style.width  = Math.round(mins/(24*60)*100) + '%';
+
+  // Prossimo evento
+  const pross = eventi.find(e => oraMins(e.ora) > mins) || eventi[0];
+  const pCard = document.getElementById('prossimo-card');
+  pCard.className = pross.tipo === 'med' ? 'tipo-med' : 'tipo-pasto';
+  document.getElementById('prossimo-icon').textContent = pross.icon;
+  document.getElementById('prossimo-desc').textContent = pross.desc;
+  document.getElementById('prossimo-ora').textContent  = pross.ora;
+  document.getElementById('countdown').textContent     = countdownStr(pross.ora, mins);
+
+  renderTimeline(dow, mins);
+  renderCassettini(dow, mins);
+  renderLog();
+  controllaScatti(now, dow, mins);
+}
+
+function faseDel(mins) {
+  if (mins <  5*60) return 'Notte';
+  if (mins <  9*60) return 'Mattina';
+  if (mins < 13*60) return 'Metà mattina';
+  if (mins < 15*60) return 'Pranzo';
+  if (mins < 18*60) return 'Pomeriggio';
+  if (mins < 21*60) return 'Sera';
+  return 'Notte';
+}
+
+function countdownStr(ora, mins) {
+  let d = oraMins(ora) - mins;
+  if (d <= 0) d += 24*60;
+  if (d === 0) return 'Adesso!';
+  const h = Math.floor(d/60), m = d%60;
+  return h > 0 ? `${h}h ${pad(m)}m` : `${m} min`;
+}
+
+// ═══════════════════════════════════════════════
+//  TIMELINE
+// ═══════════════════════════════════════════════
+function renderTimeline(dow, mins) {
+  document.getElementById('timeline').innerHTML = eventi.map(e => {
+    const em = oraMins(e.ora);
+    const passato  = em < mins - 1;
+    const corrente = Math.abs(em - mins) <= 1;
+    const presa    = prese[e.key];
+    return `<div class="tl-item ${e.tipo}-item ${passato?'passato':''} ${corrente?'corrente':''}">
+      ${presa ? '<span class="tl-check">✅</span>' : ''}
+      <div class="tl-ora">${e.ora}</div>
+      <div class="tl-icon">${e.icon}</div>
+      <div class="tl-tipo">${e.desc}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  CASSETTINI
+// ═══════════════════════════════════════════════
+function renderCassettini(dow, mins) {
+  const cass = CASSETTINI[dow] || CASSETTINI[1];
+  const meds = eventi.filter(e => e.tipo === 'med');
+
+  // Attivo = la prossima medicina non ancora presa
+  let attivoKey = null;
+  for (const e of meds) {
+    if (!prese[e.key]) { attivoKey = e.key; break; }
+  }
+
+  document.getElementById('cassettini-grid').innerHTML = meds.map(e => {
+    const num    = cass[e.cassKey];
+    const attivo = e.key === attivoKey;
+    const preso  = prese[e.key];
+    return `<div class="cass-card ${attivo?'attivo':''} ${preso?'preso':''}">
+      <div class="cass-pill-nome">Pastiglia ${e.pillola}</div>
+      <div class="cass-pill-icon">${e.icon}</div>
+      <div class="cass-numero">${num}</div>
+      <div class="cass-label">cassetto n. ${num}</div>
+      <div class="cass-ora">${e.ora}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  LOG
+// ═══════════════════════════════════════════════
+function renderLog() {
+  const oggiLog = log.filter(x => x.data === new Date().toDateString());
+  const bar = document.getElementById('log-bar');
+  bar.innerHTML = '<span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-right:4px">✅ Oggi assunto:</span>'
+    + (oggiLog.length
+        ? oggiLog.map(x=>`<div class="log-chip">${x.ora} ${x.desc}</div>`).join('')
+        : '<span style="color:var(--muted);font-size:13px">Nessuno ancora</span>');
+
+  document.getElementById('log-full').textContent = log.length
+    ? log.slice().reverse().map(x=>`[${x.data} ${x.ora}] ${x.desc} ✓`).join('\n')
+    : 'Nessun dato ancora';
+}
+
+// ═══════════════════════════════════════════════
+//  CONTROLLO SCATTI (ogni 30 sec)
+// ═══════════════════════════════════════════════
+function controllaScatti(now, dow, mins) {
+  for (const e of eventi) {
+    if (oraMins(e.ora) !== mins)  continue;
+    if (scattati[e.key])          continue;
+    scattati[e.key] = true;
+    localStorage.setItem('scattati', JSON.stringify(scattati));
+    if (e.tipo === 'med')   mostraAllarme(e, dow);
+    if (e.tipo === 'pasto') mostraPasto(e);
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  AUDIO
+// ═══════════════════════════════════════════════
+function getAudio() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+function suonaAllarme() {
+  const ctx = getAudio();
+  [523,659,784,659,523].reduce((t,f) => {
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value=f; o.type='sine';
+    g.gain.setValueAtTime(0.4,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.4);
+    o.start(t); o.stop(t+0.4); return t+0.45;
+  }, ctx.currentTime);
+}
+function suonaPasto() {
+  const ctx = getAudio();
+  [440,550,660].reduce((t,f) => {
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value=f; o.type='sine';
+    g.gain.setValueAtTime(0.18,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.55);
+    o.start(t); o.stop(t+0.55); return t+0.6;
+  }, ctx.currentTime);
+}
+
+// ═══════════════════════════════════════════════
+//  OVERLAY MEDICINA
+// ═══════════════════════════════════════════════
+function mostraAllarme(evento, dow) {
+  eventoCorrente = evento;
+  const cass = CASSETTINI[dow] || CASSETTINI[1];
+  const num  = cass[evento.cassKey];
+  document.getElementById('ov-med-titolo').textContent = 'ORA LA MEDICINA ' + evento.pillola;
+  document.getElementById('ov-med-desc').textContent   = 'ore ' + evento.ora;
+  document.getElementById('ov-med-cassettini').innerHTML =
+    `<div class="ov-cass-box">
+       <div class="ov-cass-nome"></div>
+       <div class="ov-cass-num">
+         <span class="cass-mini-label">cassetto n.</span>
+         <span class="cass-big-num">${num}</span>
+       </div>
+     </div>`;
+  document.getElementById('overlay-med').classList.add('show');
+  suonaAllarme();
+  alarmLoop = setInterval(suonaAllarme, 3500);
+}
+
+function confermaMed() {
+  clearInterval(alarmLoop);
+  document.getElementById('overlay-med').classList.remove('show');
+  const now = new Date();
+  prese[eventoCorrente.key] = true;
+  localStorage.setItem('prese', JSON.stringify(prese));
+  log.push({ data: now.toDateString(), ora:`${pad(now.getHours())}:${pad(now.getMinutes())}`, desc: eventoCorrente.desc });
+  localStorage.setItem('med_log', JSON.stringify(log));
+  render();
+}
+
+// ═══════════════════════════════════════════════
+//  OVERLAY PASTO
+// ═══════════════════════════════════════════════
+function mostraPasto(evento) {
+  const cfg = PASTO_CFG[evento.key] || { titolo: evento.desc.toUpperCase()+'!', desc:'', icon: evento.icon };
+  document.getElementById('ov-pasto-icon').textContent   = cfg.icon;
+  document.getElementById('ov-pasto-titolo').textContent = cfg.titolo;
+  document.getElementById('ov-pasto-desc').textContent   = cfg.desc;
+  document.getElementById('overlay-pasto').classList.add('show');
+  suonaPasto();
+}
+function chiudiPasto() {
+  document.getElementById('overlay-pasto').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════
+//  ADMIN
+// ═══════════════════════════════════════════════
+const ADMIN_MAP = { p1:'ora-p1', colaz:'ora-colaz', p3:'ora-p3', pranzo:'ora-pranzo', p6:'ora-p6', cena:'ora-cena', p7:'ora-p7', p10:'ora-p10' };
+
+function toggleAdmin() {
+  const p = document.getElementById('admin-panel');
+  p.classList.toggle('show');
+  if (p.classList.contains('show')) {
+    eventi.forEach(e => { const el = document.getElementById(ADMIN_MAP[e.key]); if(el) el.value = e.ora; });
+  }
+}
+
+function salvaOrari() {
+  const saved = {};
+  eventi.forEach(e => {
+    const el = document.getElementById(ADMIN_MAP[e.key]);
+    if (el) { e.ora = el.value; saved[e.key] = el.value; }
+  });
+  eventi.sort((a,b) => oraMins(a.ora)-oraMins(b.ora));
+  localStorage.setItem('orari_v2', JSON.stringify(saved));
+  // reset scatti del giorno così riscatta agli orari nuovi
+  scattati = {}; localStorage.setItem('scattati','{}');
+  render();
+  alert('✅ Orari salvati! Gli allarmi sono stati reimpostati per oggi.');
+}
+
+function testMed()   { mostraAllarme(eventi.find(e=>e.tipo==='med'),   new Date().getDay()); }
+function testPasto() { mostraPasto(  eventi.find(e=>e.tipo==='pasto')                     ); }
+
+function copiaLog() {
+  navigator.clipboard.writeText(
+    log.map(x=>`[${x.data} ${x.ora}] ${x.desc} ✓`).join('\n')
+  ).then(()=>alert('📋 Log copiato negli appunti!'));
+}
+function svuotaLog() {
+  if (confirm('Cancellare tutto lo storico delle assunzioni?')) {
+    log=[]; localStorage.setItem('med_log','[]'); renderLog();
+  }
+}
+
+// ═══════════════════════════════════════════════
+//  AVVIO — aggiorna ogni 30 secondi
+// ═══════════════════════════════════════════════
+render();
+setInterval(render, 30000);
+</script>
+</body>
+</html>
