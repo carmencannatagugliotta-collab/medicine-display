@@ -45,7 +45,7 @@
     font-family: 'Bebas Neue', sans-serif;
     font-size: 50px; letter-spacing: 3px; line-height: 1;
   }
-  #data-completa { font-size: 16px; color: rgba(255,255,255,0.5); font-weight: 300; margin-top: 3px; }
+  #data-completa { font-size: 22px; color: rgba(255,255,255,0.7); font-weight: 600; margin-top: 5px; }
   #orologio {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 70px; letter-spacing: 4px; line-height: 1;
@@ -86,26 +86,25 @@
   #countdown-label { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; text-align: right; }
 
   /* ── TIMELINE ── */
-  #timeline { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; align-items: stretch; flex-shrink: 0; }
-  #timeline::-webkit-scrollbar { display: none; }
+  #timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; flex-shrink: 0; }
   .tl-item {
-    flex: 0 0 auto; background: var(--surface); border-radius: 14px;
-    padding: 12px 14px; min-width: 100px; text-align: center;
+    background: var(--surface); border-radius: 14px;
+    padding: 10px 8px; text-align: center;
     border: 2px solid transparent; transition: all 0.3s; position: relative;
   }
   .tl-item.passato { opacity: 0.38; }
   .tl-item.corrente { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(232,160,32,0.2); }
   .tl-item.med-item .tl-tipo   { color: var(--teal); }
   .tl-item.pasto-item .tl-tipo { color: var(--blue); }
-  .tl-ora  { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1px; line-height: 1; }
-  .tl-icon { font-size: 20px; margin: 3px 0; }
-  .tl-tipo { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .tl-ora  { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 1px; line-height: 1; }
+  .tl-icon { font-size: 24px; margin: 4px 0; }
+  .tl-tipo { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
   .tl-check { position: absolute; top: 5px; right: 7px; font-size: 13px; }
 
   /* ── CASSETTINI ── */
   #cassettini-section { overflow-y: auto; }
   #cassettini-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 12px; }
-  #cassettini-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  #cassettini-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
   .cass-card {
     background: var(--surface); border-radius: 16px; padding: 16px 12px;
     text-align: center; border: 2px solid transparent;
@@ -138,8 +137,8 @@
   .cass-ora   { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
   /* ── LOG BAR ── */
-  #log-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; flex-shrink: 0; }
-  .log-chip { background: var(--surface); border-radius: 8px; padding: 5px 12px; font-size: 12px; font-weight: 600; border-left: 4px solid var(--green); }
+  #log-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; flex-shrink: 0; }
+  .log-chip { background: var(--surface); border-radius: 10px; padding: 8px 18px; font-size: 18px; font-weight: 700; border-left: 5px solid var(--green); }
 
   /* ── OVERLAY MEDICINA ── */
   #overlay-med {
@@ -307,8 +306,7 @@
   <button id="btn-ok-pasto" onclick="chiudiPasto()">👍 OK, grazie!</button>
 </div>
 
-<!-- ADMIN -->
-<button id="admin-toggle" onclick="toggleAdmin()">⚙️ Pannello Remoto</button>
+<!-- ADMIN (accesso solo da PC via Remote Admin) -->
 
 <div id="admin-panel">
   <h2>⚙️ Pannello di Controllo Remoto</h2>
@@ -504,15 +502,9 @@ function renderCassettini(dow, mins) {
   const cass = CASSETTINI[dow] || CASSETTINI[1];
   const meds = eventi.filter(e => e.tipo === 'med');
 
-  // Attivo = la prossima medicina non ancora presa
-  let attivoKey = null;
-  for (const e of meds) {
-    if (!prese[e.key]) { attivoKey = e.key; break; }
-  }
-
   document.getElementById('cassettini-grid').innerHTML = meds.map(e => {
     const num    = cass[e.cassKey];
-    const attivo = e.key === attivoKey;
+    const attivo = !prese[e.key];
     const preso  = prese[e.key];
     return `<div class="cass-card ${attivo?'attivo':''} ${preso?'preso':''}">
       <div class="cass-pill-nome">Pastiglia ${e.pillola}</div>
@@ -530,10 +522,10 @@ function renderCassettini(dow, mins) {
 function renderLog() {
   const oggiLog = log.filter(x => x.data === new Date().toDateString());
   const bar = document.getElementById('log-bar');
-  bar.innerHTML = '<span style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-right:4px">✅ Oggi assunto:</span>'
+  bar.innerHTML = '<span style="font-size:18px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-right:6px">✅ Oggi assunto:</span>'
     + (oggiLog.length
-        ? oggiLog.map(x=>`<div class="log-chip">${x.ora} ${x.desc}</div>`).join('')
-        : '<span style="color:var(--muted);font-size:13px">Nessuno ancora</span>');
+        ? oggiLog.map(x=>`<div class="log-chip">${x.ora} — ${x.desc}</div>`).join('')
+        : '<span style="color:var(--muted);font-size:18px;font-weight:600">Nessuno ancora</span>');
 
   document.getElementById('log-full').textContent = log.length
     ? log.slice().reverse().map(x=>`[${x.data} ${x.ora}] ${x.desc} ✓`).join('\n')
