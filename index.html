@@ -431,12 +431,18 @@ function suonaPasto(){
   },ctx.currentTime);
 }
 
-function leggiAdAlta(testo){
-  if(!window.speechSynthesis)return;
-  window.speechSynthesis.cancel();
-  const utt=new SpeechSynthesisUtterance(testo);
-  utt.lang='it-IT';utt.rate=0.85;utt.pitch=1;utt.volume=1;
-  window.speechSynthesis.speak(utt);
+const BASE_URL = 'https://carmencannatagugliotta-collab.github.io/medicine-display/';
+let audioVoce = null;
+
+function leggiAdAlta(file) {
+  if (audioVoce) { audioVoce.pause(); audioVoce = null; }
+  audioVoce = new Audio(BASE_URL + file);
+  audioVoce.volume = 1;
+  audioVoce.play().catch(e => console.log('Audio error', e));
+}
+
+function stopVoce() {
+  if (audioVoce) { audioVoce.pause(); audioVoce = null; }
 }
 
 function mostraAllarme(evento,dow){
@@ -450,13 +456,12 @@ function mostraAllarme(evento,dow){
   document.getElementById('ov-gocce-box').style.display=evento.gocce?'block':'none';
   document.getElementById('overlay-med').classList.add('show');
   suonaAllarme();alarmLoop=setInterval(suonaAllarme,4000);
-  const testoVoce=evento.gocce
-    ?`Attenzione! Ora devi prendere la Pastiglia 3. Ricorda anche le 10 gocce del farmaco 4.`
-    :`Attenzione! Ora devi prendere la ${evento.desc}.`;
-  setTimeout(()=>leggiAdAlta(testoVoce),800);
+  const fileVoce = evento.gocce ? 'p3.mp3' : `p${evento.pillola}.mp3`;
+  setTimeout(()=>leggiAdAlta(fileVoce), 800);
   let voceLoop=setInterval(()=>{
     if(!document.getElementById('overlay-med').classList.contains('show')){clearInterval(voceLoop);return;}
-    leggiAdAlta(evento.gocce?`Ricorda la Pastiglia 3 e le 10 gocce del farmaco 4.`:`Ricorda di prendere la ${evento.desc}.`);
+    const fileRipeti = evento.gocce ? 'r_p3.mp3' : `r_p${evento.pillola}.mp3`;
+    leggiAdAlta(fileRipeti);
   },30000);
   const delay=(parseInt(notifConfig.delay||'15'))*60*1000;
   notifTimers[evento.key]=setTimeout(()=>{
@@ -466,7 +471,7 @@ function mostraAllarme(evento,dow){
 
 function confermaMed(){
   clearInterval(alarmLoop);
-  window.speechSynthesis&&window.speechSynthesis.cancel();
+  stopVoce();
   document.getElementById('overlay-med').classList.remove('show');
   const now=new Date();
   prese[eventoCorrente.key]=true;localStorage.setItem('prese',JSON.stringify(prese));
@@ -474,7 +479,7 @@ function confermaMed(){
   log.push(entry);localStorage.setItem('med_log',JSON.stringify(log));
   if(notifTimers[eventoCorrente.key]){clearTimeout(notifTimers[eventoCorrente.key]);delete notifTimers[eventoCorrente.key];}
   inviaNotifica(`✅ ${eventoCorrente.desc} delle ${eventoCorrente.ora} è stata presa alle ${entry.ora}.`,true);
-  leggiAdAlta('Brava! Medicina presa. Buona giornata.');
+  leggiAdAlta('brava.mp3');
   render();
 }
 
@@ -484,10 +489,10 @@ function mostraPasto(evento){
   document.getElementById('ov-pasto-icon').textContent=cfg.icon;
   document.getElementById('ov-pasto-desc').textContent=cfg.desc;
   document.getElementById('overlay-pasto').classList.add('show');
-  suonaPasto();setTimeout(()=>leggiAdAlta(cfg.desc),600);
+  suonaPasto();setTimeout(()=>leggiAdAlta(`${evento.key}.mp3`),600);
 }
 function chiudiPasto(){
-  window.speechSynthesis&&window.speechSynthesis.cancel();
+  stopVoce();
   document.getElementById('overlay-pasto').classList.remove('show');
 }
 
@@ -565,6 +570,7 @@ setInterval(render,30000);
 </script>
 </body>
 </html>
+
 
 
 
