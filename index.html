@@ -493,12 +493,18 @@ function chiudiPasto(){
 }
 
 async function inviaNotifica(messaggio, confermata) {
-  // WhatsApp via CallMeBot
-  if (notifConfig.whatsapp && notifConfig.apikey) {
-    try {
-      await fetch(`https://api.callmebot.com/whatsapp.php?phone=${notifConfig.whatsapp}&text=${encodeURIComponent(messaggio)}&apikey=${notifConfig.apikey}`, {mode:'no-cors'});
-    } catch(e) { console.log('WhatsApp error', e); }
-  }
+  // Notifica push via Ntfy
+  try {
+    await fetch('https://ntfy.sh/medicine-carmen-mau', {
+      method: 'POST',
+      headers: {
+        'Title': confermata ? '✅ Medicina presa' : '⚠️ Medicina NON confermata',
+        'Priority': confermata ? 'default' : 'urgent',
+        'Tags': confermata ? 'white_check_mark' : 'warning'
+      },
+      body: messaggio
+    });
+  } catch(e) { console.log('Ntfy error', e); }
   // Email via EmailJS
   try {
     await emailjs.send('service_ooomo58', 'template_xouyux1', {
