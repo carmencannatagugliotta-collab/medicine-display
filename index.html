@@ -456,12 +456,12 @@ function mostraAllarme(evento,dow){
   document.getElementById('overlay-med').classList.add('show');
   suonaAllarme();alarmLoop=setInterval(suonaAllarme,4000);
   const testoVoce=evento.gocce
-    ?`Attenzione! Ora devi prendere la Pastiglia 3. Apri il cassetto numero ${num}. Ricorda anche le 10 gocce del farmaco 4.`
-    :`Attenzione! Ora devi prendere la ${evento.desc}. Apri il cassetto numero ${num}.`;
+    ?`Attenzione! Ora devi prendere la Pastiglia 3. Ricorda anche le 10 gocce del farmaco 4.`
+    :`Attenzione! Ora devi prendere la ${evento.desc}.`;
   setTimeout(()=>leggiAdAlta(testoVoce),800);
   let voceLoop=setInterval(()=>{
     if(!document.getElementById('overlay-med').classList.contains('show')){clearInterval(voceLoop);return;}
-    leggiAdAlta(evento.gocce?`Ricorda la Pastiglia 3 e le 10 gocce del farmaco 4. Cassetto numero ${num}.`:`Ricorda di prendere la ${evento.desc}. Cassetto numero ${num}.`);
+    leggiAdAlta(evento.gocce?`Ricorda la Pastiglia 3 e le 10 gocce del farmaco 4.`:`Ricorda di prendere la ${evento.desc}.`);
   },30000);
   const delay=(parseInt(notifConfig.delay||'15'))*60*1000;
   notifTimers[evento.key]=setTimeout(()=>{
@@ -570,5 +570,6 @@ setInterval(render,30000);
 </script>
 </body>
 </html>
+
 
 
