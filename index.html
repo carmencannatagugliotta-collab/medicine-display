@@ -381,8 +381,8 @@ function renderCassettini(dow){
   document.getElementById('cassettini-grid').innerHTML=meds.map(e=>{
     const num=cass[e.cassKey],attivo=!prese[e.key],preso=prese[e.key];
     return `<div class="cass-card ${attivo?'attivo':''} ${preso?'preso':''}">
-      <div class="cass-pill-nome">Past. ${e.pillola}</div>
-      <div class="cass-numero">${num}</div>
+      <div style="font-size:36px;margin-bottom:4px;">💊</div>
+      <div class="cass-numero">${e.pillola}</div>
       <div class="cass-label">cassetto n. ${num}</div>
       <div class="cass-ora">${e.ora}</div>
     </div>`;
@@ -545,3 +545,4 @@ setInterval(render,30000);
 </script>
 </body>
 </html>
+
