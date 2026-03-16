@@ -124,8 +124,8 @@
     background: var(--red); position: absolute; top: 0; left: 0; right: 0; padding: 20px;
   }
   .ov-top-titolo { font-size: 56px; font-weight: 900; color: white; line-height: 1; letter-spacing: -1px; }
-  .ov-med-nome { font-size: 50px; font-weight: 900; color: var(--red); line-height: 1.1; margin-top: 130px; }
-  .ov-med-ora  { font-size: 28px; font-weight: 700; color: var(--muted); }
+  .ov-med-nome { font-size: clamp(70px, 14vh, 120px); font-weight: 900; color: var(--red); line-height: 1.1; margin-top: 130px; letter-spacing: -2px; text-transform: uppercase; border: 6px solid var(--red); border-radius: 20px; padding: 20px 40px; background: #fff0ee; }
+  .ov-med-ora  { font-size: clamp(22px, 3.5vh, 32px); font-weight: 700; color: var(--muted); }
   .ov-cass-box {
     background: var(--navy); border-radius: 24px; padding: 22px 40px; text-align: center;
   }
@@ -251,11 +251,6 @@
   </div>
   <div class="ov-med-nome" id="ov-med-nome">—</div>
   <div class="ov-med-ora"  id="ov-med-ora">—</div>
-  <div class="ov-cass-box">
-    <div class="ov-cass-label">Apri il cassetto numero</div>
-    <div class="ov-cass-num"   id="ov-cass-num">—</div>
-    <div class="ov-cass-testo" id="ov-cass-testo">—</div>
-  </div>
   <div id="ov-gocce-box" style="display:none;background:#fff3cd;border:3px solid var(--amber);border-radius:20px;padding:18px 30px;text-align:center;width:100%;max-width:580px;">
     <div style="font-size:32px;font-weight:900;color:var(--amber);">💧 RICORDA ANCHE:</div>
     <div style="font-size:36px;font-weight:900;color:var(--text);margin-top:8px;">10 gocce del farmaco 4</div>
@@ -570,6 +565,7 @@ setInterval(render,30000);
 </script>
 </body>
 </html>
+
 
 
 
