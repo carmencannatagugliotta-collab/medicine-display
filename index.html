@@ -23,7 +23,8 @@
     font-family: 'Nunito', sans-serif;
     background: var(--bg);
     color: var(--text);
-    min-height: 100vh;
+    width: 100vw;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -34,75 +35,74 @@
   #topbar {
     background: var(--navy);
     color: white;
-    padding: 18px 30px 14px;
+    padding: 1vh 28px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
     border-bottom: 4px solid var(--amber);
   }
-  #giorno-nome { font-size: 52px; font-weight: 900; line-height: 1; letter-spacing: -1px; }
-  #data-completa { font-size: 24px; font-weight: 700; color: rgba(255,255,255,0.75); margin-top: 4px; }
-  #orologio { font-size: 80px; font-weight: 900; line-height: 1; letter-spacing: -2px; }
+  #giorno-nome { font-size: clamp(24px, 5vh, 48px); font-weight: 900; line-height: 1; letter-spacing: -1px; }
+  #data-completa { font-size: clamp(14px, 2.2vh, 22px); font-weight: 700; color: rgba(255,255,255,0.75); margin-top: 2px; }
+  #orologio { font-size: clamp(36px, 7vh, 72px); font-weight: 900; line-height: 1; letter-spacing: -2px; }
   #fase-tag {
     background: var(--amber); color: white;
-    font-size: 22px; font-weight: 900;
-    padding: 10px 24px; border-radius: 50px;
+    font-size: clamp(14px, 2.2vh, 22px); font-weight: 900;
+    padding: 0.6vh 20px; border-radius: 50px;
     text-transform: uppercase; letter-spacing: 1px;
   }
 
   /* ══ MAIN ══ */
   #main {
     flex: 1; display: flex; flex-direction: column;
-    gap: 14px; padding: 16px 24px 14px; overflow: hidden;
+    gap: 1.2vh; padding: 1.2vh 20px 1vh; overflow: hidden;
   }
 
   /* ══ PROSSIMO EVENTO ══ */
   #prossimo-card {
-    border-radius: 20px; padding: 20px 28px;
+    border-radius: 18px; padding: 1.5vh 22px;
     display: flex; align-items: center; justify-content: space-between;
     flex-shrink: 0; border: 3px solid transparent;
   }
   #prossimo-card.tipo-med   { background: #e8f5f2; border-color: var(--teal); }
   #prossimo-card.tipo-pasto { background: #e8f0fa; border-color: var(--blue); }
-  #prossimo-left { display: flex; align-items: center; gap: 18px; }
-  #prossimo-icon { font-size: 52px; line-height: 1; }
-  #prossimo-label { font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 2px; }
-  #prossimo-desc  { font-size: 42px; font-weight: 900; line-height: 1.1; color: var(--text); }
-  #prossimo-ora   { font-size: 26px; font-weight: 700; color: var(--muted); margin-top: 2px; }
-  #countdown-box  { text-align: right; }
-  #countdown-label { font-size: 20px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-  #countdown { font-size: 58px; font-weight: 900; color: var(--text); line-height: 1; }
+  #prossimo-left { display: flex; align-items: center; gap: 14px; }
+  #prossimo-icon { font-size: clamp(28px, 5vh, 50px); line-height: 1; }
+  #prossimo-label { font-size: clamp(12px, 1.6vh, 18px); font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 2px; }
+  #prossimo-desc  { font-size: clamp(20px, 3.8vh, 38px); font-weight: 900; line-height: 1.1; color: var(--text); }
+  #prossimo-ora   { font-size: clamp(14px, 2.2vh, 22px); font-weight: 700; color: var(--muted); margin-top: 2px; }
+  #countdown-box  { text-align: right; flex-shrink: 0; }
+  #countdown-label { font-size: clamp(12px, 1.6vh, 18px); font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  #countdown { font-size: clamp(28px, 5.5vh, 54px); font-weight: 900; color: var(--text); line-height: 1; }
 
   /* ══ CASSETTINI ══ */
   #cassettini-section { flex-shrink: 0; }
-  #cassettini-title { font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 10px; }
+  #cassettini-title { font-size: clamp(13px, 1.8vh, 20px); font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 0.8vh; }
   #cassettini-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
   .cass-card {
-    background: #f4f6f9; border-radius: 14px; padding: 12px 6px;
+    background: #f4f6f9; border-radius: 14px; padding: 1vh 6px;
     text-align: center; border: 3px solid var(--border); transition: all 0.3s;
   }
   .cass-card.attivo { background: #fff8ec; border-color: var(--amber); box-shadow: 0 0 0 3px rgba(212,128,10,0.2); }
   .cass-card.preso  { background: #f0faf4; border-color: var(--green); opacity: 0.4; filter: blur(2px); }
-  .cass-pill-nome { font-size: 15px; font-weight: 900; color: var(--text); margin-bottom: 5px; text-transform: uppercase; }
   .cass-numero {
-    font-size: 42px; font-weight: 900; line-height: 1;
-    width: 58px; height: 58px; border-radius: 12px;
+    font-size: clamp(26px, 4.5vh, 46px); font-weight: 900; line-height: 1;
+    width: clamp(44px, 7vh, 62px); height: clamp(44px, 7vh, 62px); border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
     margin: 0 auto 4px; background: var(--navy); color: white; transition: all 0.3s;
   }
   .cass-card.attivo .cass-numero { background: var(--amber); color: white; transform: scale(1.08); }
-  .cass-label { font-size: 13px; color: var(--muted); font-weight: 800; }
-  .cass-ora   { font-size: 13px; color: var(--muted); margin-top: 2px; font-weight: 700; }
+  .cass-label { font-size: clamp(10px, 1.4vh, 14px); color: var(--muted); font-weight: 800; }
+  .cass-ora   { font-size: clamp(10px, 1.3vh, 13px); color: var(--muted); margin-top: 2px; font-weight: 700; }
 
   /* ══ LOG ══ */
   #log-section { flex-shrink: 0; }
-  #log-title { font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 8px; }
+  #log-title { font-size: clamp(13px, 1.8vh, 20px); font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 0.6vh; }
   #log-list { display: flex; gap: 8px; flex-wrap: wrap; }
   .log-chip {
     background: #f0faf4; border: 2px solid var(--green);
-    border-radius: 10px; padding: 10px 18px;
-    font-size: 22px; font-weight: 800; color: var(--text);
+    border-radius: 10px; padding: 0.6vh 14px;
+    font-size: clamp(14px, 2.2vh, 22px); font-weight: 800; color: var(--text);
   }
 
   /* ══ OVERLAY MEDICINA ══ */
@@ -210,6 +210,7 @@
 </div>
 
 <div id="main">
+
   <div id="prossimo-card" class="tipo-med">
     <div id="prossimo-left">
       <div id="prossimo-icon">💊</div>
@@ -232,8 +233,9 @@
 
   <div id="log-section">
     <div id="log-title">✅ Assunte oggi</div>
-    <div id="log-list"><span style="color:var(--muted);font-size:17px;font-weight:700">Nessuna ancora</span></div>
+    <div id="log-list"><span style="color:var(--muted);font-size:18px;font-weight:700">Nessuna ancora</span></div>
   </div>
+
 </div>
 
 <!-- OVERLAY MEDICINA -->
@@ -545,4 +547,5 @@ setInterval(render,30000);
 </script>
 </body>
 </html>
+
 
