@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Le Mie Medicine</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>emailjs.init('tJCp2GIsoyoirILZK');</script>
 <style>
   :root {
     --bg: #ffffff;
@@ -360,7 +362,7 @@ if(localStorage.getItem('giorno_reset')!==oggiStr){
 let scattati=JSON.parse(localStorage.getItem('scattati')||'{}');
 let prese=JSON.parse(localStorage.getItem('prese')||'{}');
 let eventoCorrente=null,alarmLoop=null,audioCtx=null,notifTimers={};
-let notifConfig=JSON.parse(localStorage.getItem('notif_config')||'{}');
+let notifConfig=JSON.parse(localStorage.getItem('notif_config')||'{"whatsapp":"393282929678","apikey":"","delay":"15","email":"momo.maurizio@gmail.com"}');
 
 function render(){
   const now=new Date(),dow=now.getDay(),mins=nowMins();
@@ -490,10 +492,21 @@ function chiudiPasto(){
   document.getElementById('overlay-pasto').classList.remove('show');
 }
 
-async function inviaNotifica(messaggio,confermata){
-  if(notifConfig.whatsapp&&notifConfig.apikey){
-    try{await fetch(`https://api.callmebot.com/whatsapp.php?phone=${notifConfig.whatsapp}&text=${encodeURIComponent(messaggio)}&apikey=${notifConfig.apikey}`,{mode:'no-cors'});}catch(e){}
+async function inviaNotifica(messaggio, confermata) {
+  // WhatsApp via CallMeBot
+  if (notifConfig.whatsapp && notifConfig.apikey) {
+    try {
+      await fetch(`https://api.callmebot.com/whatsapp.php?phone=${notifConfig.whatsapp}&text=${encodeURIComponent(messaggio)}&apikey=${notifConfig.apikey}`, {mode:'no-cors'});
+    } catch(e) { console.log('WhatsApp error', e); }
   }
+  // Email via EmailJS
+  try {
+    await emailjs.send('service_ooomo58', 'template_xouyux1', {
+      subject: confermata ? '✅ Medicina presa' : '⚠️ Medicina NON confermata',
+      message: messaggio,
+      to_email: 'momo.maurizio@gmail.com'
+    });
+  } catch(e) { console.log('Email error', e); }
 }
 
 const ADMIN_MAP={p1:'ora-p1',colaz:'ora-colaz',p3:'ora-p3',pranzo:'ora-pranzo',p6:'ora-p6',cena:'ora-cena',p7:'ora-p7',p10:'ora-p10'};
@@ -547,8 +560,4 @@ setInterval(render,30000);
 </script>
 </body>
 </html>
-
-
-
-
 
