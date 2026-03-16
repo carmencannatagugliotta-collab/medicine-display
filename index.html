@@ -450,9 +450,6 @@ function mostraAllarme(evento,dow){
   const cass=CASSETTINI[dow]||CASSETTINI[1],num=cass[evento.cassKey];
   document.getElementById('ov-med-nome').textContent=evento.desc;
   document.getElementById('ov-med-ora').textContent='Orario: '+evento.ora;
-  document.getElementById('ov-cass-num').textContent=num;
-  document.getElementById('ov-cass-testo').textContent='cassetto numero '+num;
-  // mostra box gocce solo per p3
   document.getElementById('ov-gocce-box').style.display=evento.gocce?'block':'none';
   document.getElementById('overlay-med').classList.add('show');
   suonaAllarme();alarmLoop=setInterval(suonaAllarme,4000);
