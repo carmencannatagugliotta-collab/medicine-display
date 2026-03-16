@@ -39,20 +39,24 @@
     color: white;
     padding: 1vh 28px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     flex-shrink: 0;
     border-bottom: 4px solid var(--amber);
+    text-align: center;
+    gap: 0.3vh;
   }
+  #data-completa { font-size: clamp(22px, 3.8vh, 34px); font-weight: 700; color: rgba(255,255,255,0.85); }
+  #giorno-fase { display: flex; align-items: center; gap: 16px; }
   #giorno-nome { font-size: clamp(40px, 9vh, 75px); font-weight: 900; line-height: 1; letter-spacing: -1px; }
-  #data-completa { font-size: clamp(22px, 3.8vh, 34px); font-weight: 700; color: rgba(255,255,255,0.75); margin-top: 2px; }
-  #orologio { font-size: clamp(58px, 11vh, 105px); font-weight: 900; line-height: 1; letter-spacing: -2px; }
   #fase-tag {
     background: var(--amber); color: white;
     font-size: clamp(22px, 3.8vh, 34px); font-weight: 900;
     padding: 0.8vh 22px; border-radius: 50px;
     text-transform: uppercase; letter-spacing: 1px;
   }
+  #orologio { font-size: clamp(58px, 11vh, 105px); font-weight: 900; line-height: 1; letter-spacing: -2px; }
 
   /* ══ MAIN ══ */
   #main {
@@ -203,11 +207,11 @@
 <body>
 
 <div id="topbar">
-  <div>
+  <div id="data-completa">—</div>
+  <div id="giorno-fase">
     <div id="giorno-nome">—</div>
-    <div id="data-completa">—</div>
+    <div id="fase-tag">—</div>
   </div>
-  <div id="fase-tag">—</div>
   <div id="orologio">00:00</div>
 </div>
 
@@ -566,4 +570,5 @@ setInterval(render,30000);
 </script>
 </body>
 </html>
+
 
