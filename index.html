@@ -365,6 +365,14 @@ let notifConfig=JSON.parse(localStorage.getItem('notif_config')||'{"whatsapp":"3
 
 function render(){
   const now=new Date(),dow=now.getDay(),mins=nowMins();
+
+  // Reset giornaliero
+  const oggi=now.toDateString();
+  if(localStorage.getItem('giorno_reset')!==oggi){
+    localStorage.setItem('giorno_reset',oggi);
+    scattati={}; localStorage.setItem('scattati','{}');
+    prese={};    localStorage.setItem('prese','{}');
+  }
   document.getElementById('giorno-nome').textContent=GIORNI[dow];
   document.getElementById('data-completa').textContent=`${now.getDate()} ${MESI[now.getMonth()]} ${now.getFullYear()}`;
   document.getElementById('orologio').textContent=`${pad(now.getHours())}:${pad(now.getMinutes())}`;
@@ -567,6 +575,7 @@ setInterval(render,30000);
 </script>
 </body>
 </html>
+
 
 
 
